@@ -5,17 +5,25 @@ import {
   StyleSheet,
   Text,
   ActivityIndicator,
+  TextInputProps,
 } from 'react-native';
 
-const CustomSearchBar = ({
+type CustomSearchBarProps = {
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  debounceTime?: number;
+};
+
+const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
   value,
   onChangeText,
   placeholder = 'Search...',
   debounceTime = 500,
 }) => {
-  const [inputValue, setInputValue] = useState(value);
-  const [loading, setLoading] = useState(false);
-  const debounceRef = useRef(null);
+  const [inputValue, setInputValue] = useState<string>(value);
+  const [loading, setLoading] = useState<boolean>(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -27,7 +35,9 @@ const CustomSearchBar = ({
       setLoading(false);
     }, debounceTime);
 
-    return () => clearTimeout(debounceRef.current);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [inputValue, debounceTime]);
 
   return (

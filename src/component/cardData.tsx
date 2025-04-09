@@ -1,27 +1,58 @@
-import React, {useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React from 'react';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  GestureResponderEvent,
+} from 'react-native';
 import {useWishlist} from './wishListData';
 
-const CardData = ({
+export interface ProductItem {
+  id: number;
+  title: string;
+  price: number;
+  image: string;
+  description?: string;
+  rating?: {
+    rate: number;
+    count?: number;
+  };
+}
+
+interface CardDataProps {
+  uri: string;
+  title: string;
+  price: number;
+  description?: string;
+  onPress?: (event: GestureResponderEvent) => void;
+  wishlistIcon?: boolean;
+  item?: ProductItem;
+}
+
+const CardData: React.FC<CardDataProps> = ({
   uri,
   title,
   price,
   onPress,
   description,
-  wishlistIcon,
+  wishlistIcon = false,
   item,
 }) => {
   const {addToWishlist, removeFromWishlist, isInWishlist} = useWishlist();
 
   const toggleHeart = () => {
-    if (isInWishlist(item)) {
-      removeFromWishlist(item);
-    } else {
-      addToWishlist(item);
+    if (item) {
+      if (isInWishlist(item)) {
+        removeFromWishlist(item);
+      } else {
+        addToWishlist(item);
+      }
     }
   };
 
-  const liked = isInWishlist(item);
+  const liked = item ? isInWishlist(item) : false;
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
@@ -36,18 +67,18 @@ const CardData = ({
         <Text style={styles.title}>{title}</Text>
       </View>
 
-      <Image source={{uri: uri}} style={styles.image} />
+      <Image source={{uri}} style={styles.image} />
 
       <View style={styles.details}>
         <Text style={styles.label}>Price:</Text>
         <Text style={styles.value}>₹{price}</Text>
 
-        {description ? (
+        {description && (
           <>
             <Text style={styles.label}>Description:</Text>
             <Text style={styles.description}>{description}</Text>
           </>
-        ) : null}
+        )}
       </View>
     </TouchableOpacity>
   );

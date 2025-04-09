@@ -10,23 +10,45 @@ import {
   Platform,
 } from 'react-native';
 import React, {useState} from 'react';
-import {useRoute, useNavigation} from '@react-navigation/native';
+import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
 import CardData from '../component/cardData';
 
-const ProductDetails = () => {
-  const route = useRoute();
+interface ProductItem {
+  id: number;
+  title: string;
+  price: number;
+  image: string;
+  description: string;
+}
+
+type RouteParams = {
+  params: {
+    item: ProductItem;
+  };
+};
+
+type FormErrors = {
+  name?: string;
+  email?: string;
+  message?: string;
+};
+
+const ProductDetails: React.FC = () => {
+  const route = useRoute<RouteProp<RouteParams, 'params'>>();
   const navigation = useNavigation();
   const {item} = route.params;
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [errors, setErrors] = useState({});
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const isValidEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const isValidEmail = (email: string): boolean =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   const handleSubmit = () => {
-    let formErrors = {};
+    const formErrors: FormErrors = {};
+
     if (!name.trim()) formErrors.name = 'Name is required';
     if (!email.trim()) {
       formErrors.email = 'Email is required';

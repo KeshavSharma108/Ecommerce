@@ -1,18 +1,42 @@
 import React, {useState} from 'react';
-import {FlatList, StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ListRenderItem,
+} from 'react-native';
 import GetData from "../api's/getData";
 import CardData from '../component/cardData';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
 import CustomSearchBar from '../component/searchBar';
 import FilterComponent from '../component/filter';
 
-const Product = () => {
-  const [data, setData] = useState([]);
-  const [query, setQuery] = useState('');
-  const [priceFilter, setPriceFilter] = useState(null);
-  const [ratingFilter, setRatingFilter] = useState(null);
+interface ProductItem {
+  id: number;
+  title: string;
+  price: number;
+  image: string;
+  rating?: {
+    rate: number;
+    count?: number;
+  };
+  description?: string;
+}
 
-  const {navigate} = useNavigation();
+interface PriceFilter {
+  min: number;
+  max: number;
+}
+
+const Product: React.FC = () => {
+  const [data, setData] = useState<ProductItem[]>([]);
+  const [query, setQuery] = useState<string>('');
+  const [priceFilter, setPriceFilter] = useState<PriceFilter | null>(null);
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const suggestions =
     query.length > 0
@@ -23,27 +47,27 @@ const Product = () => {
           .slice(0, 5)
       : [];
 
-  // Apply all filters: title, price, and rating
   const filteredData = data.filter(item => {
     const matchTitle = item.title.toLowerCase().includes(query.toLowerCase());
     const matchPrice =
       !priceFilter ||
       (item.price >= priceFilter.min && item.price <= priceFilter.max);
-    const matchRating = !ratingFilter || item.rating?.rate >= ratingFilter;
+    const matchRating =
+      !ratingFilter || (item.rating?.rate ?? 0) >= ratingFilter;
 
     return matchTitle && matchPrice && matchRating;
   });
 
-  const renderItem = ({item}) => (
+  const renderItem: ListRenderItem<ProductItem> = ({item}) => (
     <CardData
       title={item.title}
       price={item.price}
       uri={item.image}
-      onPress={() => navigate('Details', {item})}
+      onPress={() => navigation.navigate('Details', {item})}
     />
   );
 
-  const handleSuggestionPress = suggestion => {
+  const handleSuggestionPress = (suggestion: ProductItem) => {
     setQuery(suggestion.title);
   };
 
@@ -52,7 +76,9 @@ const Product = () => {
       <Text style={styles.productHeader}>Product Items</Text>
 
       <View style={styles.topHeader}>
-        <Text style={styles.heartIcon} onPress={() => navigate('WishList')}>
+        <Text
+          style={styles.heartIcon}
+          onPress={() => navigation.navigate('WishList')}>
           ❤️
         </Text>
         <CustomSearchBar value={query} onChangeText={setQuery} />
@@ -137,7 +163,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
-
   heartIcon: {
     fontSize: 24,
     marginRight: 10,

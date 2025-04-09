@@ -1,30 +1,40 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
-const priceRanges = [
+type PriceRange = {min: number; max: number} | null;
+
+type FilterComponentProps = {
+  onPriceChange: (value: PriceRange) => void;
+  onRatingChange: (value: number | null) => void;
+};
+
+const priceRanges: {label: string; value: PriceRange}[] = [
   {label: 'All', value: null},
   {label: 'Under $50', value: {min: 0, max: 50}},
   {label: '$50 - $100', value: {min: 50, max: 100}},
   {label: 'Above $100', value: {min: 100, max: Infinity}},
 ];
 
-const ratingOptions = [
+const ratingOptions: {label: string; value: number | null}[] = [
   {label: 'All', value: null},
   {label: '4★ & up', value: 4},
   {label: '3★ & up', value: 3},
 ];
 
-const FilterComponent = ({onPriceChange, onRatingChange}) => {
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedPrice, setSelectedPrice] = useState(null);
-  const [selectedRating, setSelectedRating] = useState(null);
+const FilterComponent: React.FC<FilterComponentProps> = ({
+  onPriceChange,
+  onRatingChange,
+}) => {
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
+  const [selectedRating, setSelectedRating] = useState<string | null>(null);
 
-  const handlePriceSelect = (value, label) => {
+  const handlePriceSelect = (value: PriceRange, label: string) => {
     setSelectedPrice(label);
     onPriceChange(value);
   };
 
-  const handleRatingSelect = (value, label) => {
+  const handleRatingSelect = (value: number | null, label: string) => {
     setSelectedRating(label);
     onRatingChange(value);
   };
@@ -102,11 +112,24 @@ const FilterComponent = ({onPriceChange, onRatingChange}) => {
 export default FilterComponent;
 
 const styles = StyleSheet.create({
+  container: {
+    marginBottom: 10,
+  },
   toggleText: {
     fontSize: 14,
     fontWeight: 'bold',
-
     marginBottom: 10,
+  },
+  subheading: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 6,
+    marginTop: 10,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 8,
   },
   filterButton: {
     backgroundColor: '#eee',

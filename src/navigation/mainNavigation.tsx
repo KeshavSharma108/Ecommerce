@@ -1,23 +1,31 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
-import product from '../Screens/product';
-import productDetails from '../Screens/productDetails';
-import wishList from '../Screens/wishList';
+import Product from '../Screens/product';
+import ProductDetails from '../Screens/productDetails';
+import WishList from '../Screens/wishList';
 import {WishlistProvider} from '../component/wishListData';
 
-const Stack = createNativeStackNavigator();
+export type RootStackParamList = {
+  Product: undefined;
+  Details: {item: any};
+  WishList: undefined;
+};
 
-export default function NavigationWrapper() {
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const NavigationWrapper: React.FC = () => {
   return (
     <WishlistProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="Product" component={product} />
-          <Stack.Screen name="Details" component={productDetails} />
-          <Stack.Screen name="WishList" component={wishList} />
+          <Stack.Screen name="Product" component={Product} />
+          <Stack.Screen name="Details" component={ProductDetails} />
+          <Stack.Screen name="WishList" component={WishList} />
         </Stack.Navigator>
       </NavigationContainer>
     </WishlistProvider>
   );
-}
+};
+
+export default NavigationWrapper;

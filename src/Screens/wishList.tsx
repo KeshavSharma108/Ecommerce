@@ -10,13 +10,33 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useWishlist} from '../component/wishListData';
 
-const WishlistScreen = () => {
+interface WishlistItem {
+  id: number;
+  title: string;
+  image: string;
+  price: number;
+}
+
+const WishlistScreen: React.FC = () => {
   const {wishlist, removeFromWishlist} = useWishlist();
   const navigation = useNavigation();
 
+  const renderItem = ({item}: {item: WishlistItem}) => (
+    <View style={styles.card}>
+      <Image source={{uri: item.image}} style={styles.image} />
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.price}>₹{item.price}</Text>
+
+      <TouchableOpacity
+        style={styles.removeButton}
+        onPress={() => removeFromWishlist(item)}>
+        <Text style={styles.removeButtonText}>Remove</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      {/* 🔙 Back Button */}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}>
@@ -30,21 +50,9 @@ const WishlistScreen = () => {
       ) : (
         <FlatList
           data={wishlist}
+          keyExtractor={(item: WishlistItem) => item.id.toString()}
+          renderItem={renderItem}
           showsVerticalScrollIndicator={false}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => (
-            <View style={styles.card}>
-              <Image source={{uri: item.image}} style={styles.image} />
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.price}>₹{item.price}</Text>
-
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => removeFromWishlist(item)}>
-                <Text style={styles.removeButtonText}>Remove</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         />
       )}
     </View>
